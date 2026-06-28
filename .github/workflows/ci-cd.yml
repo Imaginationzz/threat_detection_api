@@ -54,8 +54,13 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/threat-detection:latest
+
+            docker ps -q --filter "publish=8000" | xargs -r docker stop
+            docker ps -aq --filter "publish=8000" | xargs -r docker rm
+
             docker stop threat-detection-api || true
             docker rm threat-detection-api || true
+
             docker run -d \
               --name threat-detection-api \
               -p 8000:8000 \
